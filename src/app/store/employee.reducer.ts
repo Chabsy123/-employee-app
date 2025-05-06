@@ -1,61 +1,65 @@
-import { createReducer, on } from "@ngrx/store";
- import { employeeState } from "./employee.state";
- import { addEmployeeSuc, deleteEmployeeSuc, getEmployee, loadEmployeeFail, loadEmployeeSuc, updateEmployeeSuc } from "./Employee.Action";
- import { state } from "@angular/animations";
+import { createReducer, on } from '@ngrx/store';
+import { employeeState, EmployeeModel } from './employee.state';
+import {
+  addEmployeeSuc,
+  deleteEmployeeSuc,
+  getEmployee,
+  loadEmployeeFail,
+  loadEmployeeSuc,
+  updateEmployeeSuc
+} from './employee.actions';
+import { Employee } from '../model/employee';
 
- const _employeeReducer = createReducer(employeeState,
-     on(loadEmployeeSuc, (state, action) => {
-         return {
-             ...state,
-             list: action.list,
-             errormessage: ''
-         }
-     }),
-     on(loadEmployeeFail, (state, action) => {
-         return {
-             ...state,
-             list: [],
-             errormessage: action.errMsg
-         }
-     }),
-     on(deleteEmployeeSuc, (state, action) => {
-         const _newdata = state.list.filter(o => o.id != action.empId)
-         return {
-             ...state,
-             list: _newdata,
-             errormessage: ''
-         }
-     }),
-     on(addEmployeeSuc, (state, action) => {
-         const _newdata = { ...action.data };
-         return {
-             ...state,
-             list: [...state.list, _newdata],
-             errormessage: ''
-         }
-     }),
-     on(updateEmployeeSuc, (state, action) => {
-         const _newdata = state.list.map(o => {
-             return o.id === action.data.id ? action.data : o
-         })
-         return {
-             ...state,
-             list: _newdata,
-             errormessage: ''
-         }
-     }),
-     on(getEmployee, (state, action) => {
-         let _newdata = state.list.find(o =>o.id===action.empId);
-         if(_newdata==null){
-             _newdata=state.empobj;
-         }
-         return {
-             ...state,
-             empobj:_newdata
-         }
-     })
- );
+const _employeeReducer = createReducer(
+  employeeState,
 
- export function employeeReducer(state: any, action: any) {
-     return _employeeReducer(state, action);
- }
+  on(loadEmployeeSuc, (state, action): EmployeeModel => ({
+    ...state,
+    list: action.list,
+    errormessage: ''
+  })),
+
+  on(loadEmployeeFail, (state, action): EmployeeModel => ({
+    ...state,
+    list: [],
+    errormessage: action.errMsg
+  })),
+
+  on(deleteEmployeeSuc, (state, action): EmployeeModel => {
+    const _newdata: Employee[] = state.list.filter(emp => emp.id !== action.empId);
+    return {
+      ...state,
+      list: _newdata,
+      errormessage: ''
+    };
+  }),
+
+  on(addEmployeeSuc, (state, action): EmployeeModel => ({
+    ...state,
+    list: [...state.list, { ...action.data }],
+    errormessage: ''
+  })),
+
+  on(updateEmployeeSuc, (state, action): EmployeeModel => {
+    const _newdata: Employee[] = state.list.map(emp =>
+      emp.id === action.data.id ? action.data : emp
+    );
+    return {
+      ...state,
+      list: _newdata,
+      errormessage: ''
+    };
+  }),
+
+  on(getEmployee, (state, action): EmployeeModel => {
+    const _found = state.list.find(emp => emp.id === action.empId);
+    return {
+      ...state,
+      empobj: _found ?? state.empobj
+    };
+  })
+);
+
+export function employeeReducer(state: EmployeeModel | undefined, action: any) {
+  return _employeeReducer(state, action);
+}

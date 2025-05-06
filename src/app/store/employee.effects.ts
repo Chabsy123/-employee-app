@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
  import { Actions, createEffect, ofType } from "@ngrx/effects";
  import { EmployeeService } from "../service/employee.service";
- import { addEmployee, addEmployeeSuc, deleteEmployee, deleteEmployeeSuc, emptyAction, loadEmployee, loadEmployeeFail, loadEmployeeSuc, updateEmployee, updateEmployeeSuc } from "./Employee.Action";
+ import { addEmployee, addEmployeeSuc, deleteEmployee, deleteEmployeeSuc, emptyAction, loadEmployee, loadEmployeeFail, loadEmployeeSuc, updateEmployee, updateEmployeeSuc } from "../store/employee.actions";
  import { catchError, exhaustMap, map, of, switchMap } from "rxjs";
  import { ToastrService } from "ngx-toastr";
 
