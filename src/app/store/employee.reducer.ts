@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
- import { employeeState } from "./Employee.State";
+ import { employeeState } from "./employee.state";
  import { addEmployeeSuc, deleteEmployeeSuc, getEmployee, loadEmployeeFail, loadEmployeeSuc, updateEmployeeSuc } from "./Employee.Action";
  import { state } from "@angular/animations";
 

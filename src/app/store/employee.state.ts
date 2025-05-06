@@ -1,4 +1,4 @@
-import { EmployeeModel } from "./Employee.Model";
+ import { Employee } from "../model/employee";
 
  export const employeeState:EmployeeModel={
      list: [],
