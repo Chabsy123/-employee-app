@@ -1,5 +1,13 @@
-import { Employee } from './employee/employee.model';
+import { EmployeeModel } from "./Employee.Model";
 
-export interface AppState {
-    employees: Employee[]
-}
+ export const employeeState:EmployeeModel={
+     list: [],
+     errormessage: "",
+     empobj:{
+         id: 0,
+         name: "",
+         doj: new Date(),
+         role: "",
+         salary: 0
+     }
+ }
