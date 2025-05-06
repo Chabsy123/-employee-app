@@ -1,90 +1,62 @@
-import { inject, Injectable } from "@angular/core";
- import { Actions, createEffect, ofType } from "@ngrx/effects";
- import { EmployeeService } from "../service/employee.service";
- import { addEmployee, addEmployeeSuc, deleteEmployee, deleteEmployeeSuc, emptyAction, loadEmployee, loadEmployeeFail, loadEmployeeSuc, updateEmployee, updateEmployeeSuc } from "../store/employee.actions";
- import { catchError, exhaustMap, map, of, switchMap } from "rxjs";
- import { ToastrService } from "ngx-toastr";
+import { EmployeeService } from './../service/employee.service';
+import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { addEmployee, updateEmployee, getEmployee } from './employee.actions';
+import { mergeMap, map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { Employee } from '../model/employee';
 
- @Injectable()
- export class empEffects {
-     // constructor(private actions$: Actions, private service: EmployeeService) {
+@Injectable()
+export class EmployeeEffects {
 
-     // }
+  constructor(
+    private actions$: Actions,
+    private employeeService: EmployeeService
+  ) {}
 
-     actions$ = inject(Actions);
-     service = inject(EmployeeService);
-     toastr = inject(ToastrService)
+  addEmployee$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(addEmployee),
+      mergeMap(action =>
+        this.employeeService.Create(action.data).pipe(
+          map((employee: Employee) => ({
+            type: '[Employee API] Add Employee Success',
+            data: employee
+          })),
+          catchError(() => of({ type: '[Employee API] Add Employee Failed' }))
+        )
+      )
+    )
+  );
 
+  updateEmployee$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(updateEmployee),
+      mergeMap(action =>
+        this.employeeService.Update(action.data.id, action.data).pipe(
+          map((employee: Employee) => ({
+            type: '[Employee API] Update Employee Success',
+            data: employee
+          })),
+          catchError(() => of({ type: '[Employee API] Update Employee Failed' }))
+        )
+      )
+    )
+  );
 
-     _loadEmployee = createEffect(() =>
-         this.actions$.pipe(
-             ofType(loadEmployee),
-             exhaustMap(() => {
-                 return this.service.GetAll().pipe(
-                     map((data) => {
-                         return loadEmployeeSuc({ list: data })
-                     }),
-                     catchError((err) => of(loadEmployeeFail({ errMsg: err.message })))
-                 )
-             })
-         )
-     )
+  getEmployee$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getEmployee),
+      mergeMap(action =>
+        this.employeeService.Get(action.empId).pipe(
+          map((employee: Employee) => ({
+            type: '[Employee API] Get Employee Success',
+            data: employee
+          })),
+          catchError(() => of({ type: '[Employee API] Get Employee Failed' }))
+        )
+      )
+    )
+  );
 
-     _deleteEmployee = createEffect(() =>
-         this.actions$.pipe(
-             ofType(deleteEmployee),
-             switchMap((action) => {
-                 return this.service.Delete(action.empId).pipe(
-                     switchMap((data) => {
-                         return of(deleteEmployeeSuc({ empId: action.empId }),
-                         this.Showalert('Deleted Successfully.','pass')
-                     )
-                     }),
-                     catchError((err) => of(this.Showalert(err.message,'fail')))
-                 )
-             })
-         )
-     )
-
-     _addEmployee = createEffect(() =>
-         this.actions$.pipe(
-             ofType(addEmployee),
-             switchMap((action) => {
-                 return this.service.Create(action.data).pipe(
-                     switchMap((data) => {
-                         return of(addEmployeeSuc({ data: action.data }),
-                         this.Showalert('Created Successfully.','pass')
-                     )
-                     }),
-                     catchError((err) => of(this.Showalert(err.message,'fail')))
-                 )
-             })
-         )
-     )
-
-     _updateEmployee = createEffect(() =>
-         this.actions$.pipe(
-             ofType(updateEmployee),
-             switchMap((action) => {
-                 return this.service.Update(action.data).pipe(
-                     switchMap((data) => {
-                         return of(updateEmployeeSuc({ data: action.data }),
-                         this.Showalert('Updated Successfully.','pass')
-                     )
-                     }),
-                     catchError((err) => of(this.Showalert(err.message,'fail')))
-                 )
-             })
-         )
-     )
-
-     Showalert(message: string, response: string) {
-         if (response == 'pass') {
-             this.toastr.success(message);
-         }else{
-             this.toastr.error(message);
-         }
-         return emptyAction();
-     }
-
- }
+}
